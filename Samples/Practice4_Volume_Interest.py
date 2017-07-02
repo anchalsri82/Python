@@ -18,3 +18,4 @@ Rate = 3.5
 Maturity = Principle * (1 + Rate * Time)
 
 print("Maturity = " + str(Maturity))
+
