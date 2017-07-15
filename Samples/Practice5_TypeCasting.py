@@ -32,7 +32,6 @@ if(value%2 ==0):
 else:
     print("number is odd")
     
-    
 value = int(input("Enter interger value:"))
 if(value%2 ==0):
     print("number is even")
@@ -68,10 +67,3 @@ print(3e8)
 x=1
 y = x+3
 z = 4+10**-5
-
-
-
-
-
-
-
