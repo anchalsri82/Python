@@ -4,7 +4,7 @@ from statsmodels.tsa.api import VAR
 from statsmodels.regression.linear_model import OLS
 from statsmodels.tsa.tsatools import (lagmat, add_trend)
 from statsmodels.tsa.stattools import adfuller
-
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.pylab as pylab
