@@ -24,21 +24,6 @@ Y2_t = instrument2['Adj Close'].values
 dY1_t = pd.Series(Y1_t, name='Y1_t').diff().dropna()
 dY2_t = pd.Series(Y2_t, name='Y2_t').diff().dropna()
 
-# Verfify methods:
-instrument1 = pd.read_csv("D:/Projects/Python/trunk/Co-integration/MarketData/C.csv", index_col=0, parse_dates=True, dayfirst=True)
-instrument1['Returns'] = np.log(instrument1['Adj Close'].astype(np.float)/instrument1['Adj Close'].shift(1).astype(np.float))
-instrument1=instrument1[1:]
-instrument2 = pd.read_csv("D:/Projects/Python/trunk/Co-integration/MarketData/BAC.csv", index_col=0, parse_dates=True, dayfirst=True)
-instrument2['Returns'] = np.log(instrument2['Adj Close'].astype(np.float)/instrument2['Adj Close'].shift(1).astype(np.float))
-instrument2=instrument2[1:]
-returns1 = instrument1['Returns'].values
-returns2 = instrument2['Returns'].values
-Y1_t = instrument1['Adj Close'].values
-Y2_t = instrument2['Adj Close'].values
-
-dY1_t = pd.Series(Y1_t, name='Y1_t').diff().dropna()
-dY2_t = pd.Series(Y2_t, name='Y2_t').diff().dropna()
-
 ## ADF    
 data = pd.concat([instrument1['Returns'], instrument2['Returns']], axis=1, keys=['Returns1', 'Returns2']) 
 
@@ -72,7 +57,7 @@ beta2_hat = resultGetOLS['beta_hat'][0,1]
 et_hat = Y1_t - np.dot(beta2_hat, Y2_t) - a_hat
 
 # ENGLE-GRANGER STEP 2
-result_et_hat_adf = GetADFuller(Y=et_hat, maxlags=1, regression='nonconstant')
+result_et_hat_adf = GetADFuller(Y=et_hat, maxlags=1, regression='nc')
 print("ADF stat : %f" % result_et_hat_adf['adfstat'])
 
 

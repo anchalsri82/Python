@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+from statsmodels.tsa.tsatools import (lagmat, add_trend)
 import numpy as np
+import pandas as pd
+
 
 def GetOLS(Y,X):
     nobs = X.shape[1]
@@ -49,7 +52,7 @@ def GetOLS(Y,X):
     }
     return resultOLS
 
-def GetADFuller(Y, maxlags=None, regression='constant'):
+def GetADFuller(Y, maxlags=None, regression='c'):
     #Y = np.asarray(Y)
     Y = Y.T
     dy = np.diff(Y)
@@ -60,7 +63,7 @@ def GetADFuller(Y, maxlags=None, regression='constant'):
     ydall[:, 0] = Y[-nobs - 1:-1] 
     dYshort = dy[-nobs:] 
     
-    if regression != 'nonconstant':
+    if regression != 'nc':
         Z = add_trend(ydall[:, :maxlags + 1], regression) 
     else:
         Z = ydall[:, :maxlags + 1]
@@ -77,7 +80,7 @@ def GetADFuller(Y, maxlags=None, regression='constant'):
     
     return resultADFuller
 
-def GetVectorAR(Y, maxlags=None):
+def GetVectorAR(Y, maxlags=None,  trend=None):
     nobs = Y.shape[1]
     Yshort = Y[:,maxlags:]
     Z =  np.ones(nobs-maxlags)
@@ -86,8 +89,13 @@ def GetVectorAR(Y, maxlags=None):
     else:
         for j in range(1,maxlags+1):
             Z = np.vstack((Z, Y[:,maxlags-j:-j]))
+    if trend is not None:
+        Z = add_trend(Z.T, prepend=True, trend=trend)  # prepends puts trend column at the beginning
+        Z = Z.T
+
     resultVectorAR = GetOLS(Y=Yshort, X=Z)
-    K_dash = 2 * (2*maxlags + 1)
+    resultVectorAR['maxlags'] = maxlags
+    K_dash = 2 * (2* maxlags + 1)
     AIC = np.log(np.absolute(np.linalg.det(resultVectorAR['sigma_hat']))) + 2.0 * K_dash / (resultVectorAR['nobs']) # log(sigma_hat) + 2*K_dash/T        
     BIC = np.log(np.absolute(np.linalg.det(resultVectorAR['sigma_hat']))) + (K_dash/ resultVectorAR['nobs']) * np.log(resultVectorAR['nobs']) # log(sigma_hat) + K_dash/T*log(T)
     resultVectorAR['AIC'] = AIC
@@ -115,8 +123,39 @@ def IsStable(roots):
     return np.all(np.abs(roots) > 1)
 
 
-def static_zscore(series, mean=None, sigma=None):
+def GetZScore(series, mean=None, sigma=None):
     if (mean != None and sigma != None):
         return (series - mean) / sigma
     else:
         return (series - series.mean()) / np.std(series)
+
+
+# ==== GENERATE P&L DATAFRAME FOR A GIVEN SPREAD
+
+def Get_Pnl_DF(spread, mean, sigma):
+    """
+    Note the input spread must be zscore-normalised
+    """
+    spread_norm = (spread - mean) / sigma  # normalise as z-score
+    df_pnl_is = pd.DataFrame(index=spread.index)
+    df_pnl_is['e_t_hat'] = spread
+    df_pnl_is['e_t_hat_norm'] = spread_norm
+    # df_pnl_is['diff'] = df_pnl_is['e_t_hat'].diff()
+    df_pnl_is['pos'] = np.nan
+    # Go long the spread when it is below -1 as expectation is it will rise
+    df_pnl_is.loc[df_pnl_is['e_t_hat_norm'] <= -1.0, 'pos'] = 1
+    # Go short the spread when it is above +1 as expectation is it will fall
+    df_pnl_is.loc[df_pnl_is['e_t_hat_norm'] >= 1.0, 'pos'] = -1
+    # Exit positions when close to zero
+    df_pnl_is.loc[(df_pnl_is['e_t_hat_norm'] < 0.1) & (df_pnl_is['e_t_hat_norm'] > -0.1), 'pos'] = 0
+    # # forward fill NaN's with previous value
+    df_pnl_is['pos'] = df_pnl_is['pos'].fillna(method='pad')
+
+    # Returns must be calculated in unnormalised spread
+    df_pnl_is['chg'] = df_pnl_is['e_t_hat'].diff().shift(
+        -1)  # adopting Boris convention with shift(-1) (must shift after taking diff)
+    # PnL
+    df_pnl_is['pnl'] = df_pnl_is['pos'] * df_pnl_is['chg']
+    df_pnl_is['pnl_cum'] = df_pnl_is['pnl'].cumsum()
+
+    return df_pnl_is
