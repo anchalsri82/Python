@@ -375,3 +375,35 @@ plot_drawdown_periods(df_pnl_os['pnl'], k=k, top=5)
 plt.axvline(df_temp.index[-1], color='black', linestyle='--')
 plt.legend(['in-sample', 'out-of-sample', 'boundary'], loc='upper left')
 
+
+
+
+# Monte carlo 
+np.random.seed(2000)
+d_t = 1  
+M = 500  
+
+mu = 12
+sigma = 0.25
+
+Y_t1 = np.zeros((M + 1))
+Y_t2 = np.zeros((M + 1))
+
+Y_t1[0] = -75.0
+Y_t2[0] = 70.0
+
+theta_1 = 0.004
+theta_2 = 0.02
+
+for i in range(1, M + 1):
+    Y_t1[i] = Y_t1[i-1] + theta_1 * (mu - Y_t1[i-1]) * d_t + sigma * math.sqrt(d_t) * np.random.normal(0, 1)
+    Y_t2[i] = Y_t2[i-1] + theta_2 * (mu - Y_t2[i-1]) * d_t + sigma * math.sqrt(d_t) * np.random.normal(0, 1)
+
+Y_t = np.vstack((Y_t1,Y_t2))
+print(Y_t)
+Y_t1 = pd.Series(Y_t1, name='Y_t')
+_ = Y_t1.plot()
+_ = Y_t1.diff().plot()
+# _ = plt.ylabel('Series Value')
+_ = plt.xlabel('Time')
+_ = plt.legend(['Random walk with drift', 'Stationary Difference'], loc='upper left')
