@@ -27,9 +27,12 @@
         <entry file="file://$PROJECT_DIR$/Cointegration.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="140">
-              <caret line="134" column="14" lean-forward="false" selection-start-line="134" selection-start-column="4" selection-end-line="134" selection-end-column="14" />
+              <caret line="131" column="14" lean-forward="false" selection-start-line="131" selection-start-column="4" selection-end-line="131" selection-end-column="14" />
               <folding>
                 <element signature="e#24#80#0" expanded="true" />
+                <marker date="1500605941341" expanded="true" signature="4644:4791" ph="..." />
+                <marker date="1500605941341" expanded="true" signature="4829:6050" ph="..." />
+                <marker date="1500605941341" expanded="true" signature="4834:4897" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
               </folding>
             </state>
           </provider>
@@ -272,7 +275,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="0" width="1292" height="745" extended-state="0" />
+    <frame x="-7" y="0" width="1292" height="745" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17868339" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -333,9 +336,12 @@
     <entry file="file://$PROJECT_DIR$/Cointegration.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="140">
-          <caret line="134" column="14" lean-forward="false" selection-start-line="134" selection-start-column="4" selection-end-line="134" selection-end-column="14" />
+          <caret line="131" column="14" lean-forward="false" selection-start-line="131" selection-start-column="4" selection-end-line="131" selection-end-column="14" />
           <folding>
             <element signature="e#24#80#0" expanded="true" />
+            <marker date="1500605941341" expanded="true" signature="4644:4791" ph="..." />
+            <marker date="1500605941341" expanded="true" signature="4829:6050" ph="..." />
+            <marker date="1500605941341" expanded="true" signature="4834:4897" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
           </folding>
         </state>
       </provider>

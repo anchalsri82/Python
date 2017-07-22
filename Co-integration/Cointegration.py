@@ -3,7 +3,6 @@ from statsmodels.tsa.tsatools import (lagmat, add_trend)
 import numpy as np
 import pandas as pd
 
-
 def GetOLS(Y,X):
     nobs = X.shape[1]
     rank = X.shape[0]
@@ -128,9 +127,6 @@ def GetZScore(series, mean=None, sigma=None):
         return (series - mean) / sigma
     else:
         return (series - series.mean()) / np.std(series)
-
-
-# ==== GENERATE P&L DATAFRAME FOR A GIVEN SPREAD
 
 def Get_Pnl_DF(spread, mean, sigma):
     """
