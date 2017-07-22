@@ -1,14 +1,29 @@
+from matplotlib.ticker import FuncFormatter
 from __future__ import division
-import numpy as np
-import pandas as pd
-import math
 
-M = 300
+import pandas as pd
+import numpy as np
+import math
+from datetime import datetime
+
+%matplotlib inline
+import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.pylab as pylab
+
+
+data2 = pd.read_csv("CVAInput.csv", index_col=0)
+output = data2.to_string(formatters={'Lambda': '{:,.4%}'.format, 'PD': '{:,.4%}'.format,'P': '{:,.4%}'.format})
+print(output)
+
+
+
+M = 451
 I = 451
-n_tau = 50
+n_tau = 50 
 dt = 0.01
 shape_3D = (M + 1, I, n_tau + 1)
-np.random.seed(451)
+np.random.seed(1000)
 
 data = pd.read_csv("CVAParams.csv", index_col=0)
 mu = np.array(data.iloc[0, :], dtype=np.float)
@@ -29,12 +44,9 @@ S_plus_m = np.zeros(shape_3D, dtype=np.float)
 
 t_m[0] = 0.0
 S_plus_m[0][:] = S0
-S_minus_m = S_plus_m.copy()
+S_minus_m = S_plus_m.copy()  
 
 for i in range(1, M + 1):
-    #if i % 10 == 0:
-        #print ('i=%d' % i)
-
     rand1 = np.random.standard_normal((I, 1))
     rand2 = np.random.standard_normal((I, 1))
     rand3 = np.random.standard_normal((I, 1))
@@ -51,7 +63,7 @@ for i in range(1, M + 1):
 data2 = pd.read_csv("CVAInput.csv", index_col=0)
 
 col_names = ['Sim' + str(x) for x in range(1, I + 1)]
-f_plus = pd.DataFrame(index=data2.index, columns=col_names, dtype=np.float)
+f_plus = pd.DataFrame(index=data2.index, columns=col_names, dtype=np.float) 
 i = 0
 
 for index, row in f_plus.iterrows():
@@ -62,19 +74,17 @@ for index, row in f_plus.iterrows():
 
 freq = 0.5
 L_plus = (1.0 / freq) * (np.exp(f_plus * freq) - 1.0)
-
-
 K_plus = L_plus.iloc[0, :][0]
-
 L_plus_masked = np.ma.masked_where(L_plus < K_plus, L_plus)
 
 ZCB_plus = 1.0 / (1 + freq * L_plus)
-ZCB_plus.iloc[0, :] = 1.0
+ZCB_plus.iloc[0, :] = 1.0 
 ZCB_plus = ZCB_plus.cumprod()
 ZCB_plus_mean = pd.Series(index=ZCB_plus.index, data=np.mean(ZCB_plus, axis=1))
 
 DF = pd.DataFrame(index=ZCB_plus.index, columns=list(ZCB_plus.index))
 DF.loc[0.0, :] = ZCB_plus_mean
+
 
 for index, row in DF.iterrows():
     if index == 0.0:
@@ -82,14 +92,12 @@ for index, row in DF.iterrows():
     x = DF.loc[0.0][row.index]/DF.loc[0.0, index]
     x[x > 1] = 0
     DF.loc[index, :] = x
-
+    
+	
 np.fill_diagonal(DF.values, 0)
 N = 1.0
 V_plus = N * freq * DF.dot(L_plus - K_plus)
-
-
 E_plus = np.maximum(V_plus, 0)
-
 
 E_plus2 = np.array(E_plus, dtype=np.float32)
 E_plus_masked = np.ma.masked_where(E_plus2 == 0, E_plus2)
@@ -121,3 +129,6 @@ PD_interpol.index = index_interpol
 RR = 0.4
 CVA = (1 - RR) * EE_plus_median_interpol * DF_interpol * PD_interpol
 CVA_total = CVA.sum()
+
+
+print (CVA_total*100)
